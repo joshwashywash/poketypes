@@ -66,7 +66,6 @@
 							{stroke}
 							d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 0 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 0 ${x1},${y1}`}
 						/>
-						<circle in:draw={_draw} {stroke} {cx} {cy} r={loopRadius} />
 					{:else if path === 'line'}
 						<line in:draw={_draw} {stroke} {x1} {y1} {x2} {y2} />
 					{:else}
