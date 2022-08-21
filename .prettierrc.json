@@ -1,6 +1,7 @@
 {
-  "semi": true,
-  "singleQuote": true,
-  "useTabs": true,
-  "plugins": ["prettier-plugin-svelte"]
+	"arrowParens": "avoid",
+	"plugins": ["prettier-plugin-tailwindcss"],
+	"semi": true,
+	"singleQuote": true,
+	"useTabs": true
 }
