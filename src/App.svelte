@@ -36,7 +36,10 @@
 	const offset = createOffset(width, height);
 </script>
 
-<title>Pokemon Types</title>
+<svelte:head>
+	<title>Pokemon Types</title>
+</svelte:head>
+
 <main class="flex max-h-screen">
 	<svg viewBox={`0 0 ${width} ${height}`}>
 		<g stroke-linecap="round">
