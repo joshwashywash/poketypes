@@ -61,11 +61,13 @@
 						{@const x = (radius + 2 * loopRadius) * Math.cos(i * angle)}
 						{@const y = (radius + 2 * loopRadius) * Math.sin(i * angle)}
 						{@const [cx, cy] = offset([x, y])}
-						<path
-							in:draw={_draw}
-							{stroke}
-							d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 0 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 0 ${x1},${y1}`}
-						/>
+						{#key path}
+							<path
+								in:draw={_draw}
+								{stroke}
+								d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 0 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 0 ${x1},${y1}`}
+							/>
+						{/key}
 					{:else if path === 'line'}
 						<line in:draw={_draw} {stroke} {x1} {y1} {x2} {y2} />
 					{:else}
