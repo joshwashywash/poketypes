@@ -39,12 +39,13 @@
 <title>Pokemon Types</title>
 <main class="flex max-h-screen">
 	<svg viewBox={`0 0 ${width} ${height}`}>
-		<g stroke-linecap="round" stroke="#bbb">
+		<g stroke-linecap="round">
 			{#each [...map.entries()] as [from, { twiceEffectiveAgainst }]}
 				{@const { x: x1, y: y1 } = offset(positions.get(from))}
 				{#each twiceEffectiveAgainst as to}
 					{@const { x: x2, y: y2 } = offset(positions.get(to))}
-					<line {x1} {y1} {x2} {y2} />
+					{@const stroke = map.get(from).color ?? 'white'}
+					<line {stroke} {x1} {y1} {x2} {y2} />
 				{/each}
 			{/each}
 		</g>
