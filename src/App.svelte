@@ -1,6 +1,7 @@
 <script lang="ts">
-	import types from '$lib/types.json';
 	import type { Point } from '$lib/math';
+	import types from '$lib/types.json';
+	import { draw } from 'svelte/transition';
 
 	const width = 100;
 	const height = 100;
@@ -52,6 +53,7 @@
 		<g stroke-linecap="round" fill="none">
 			{#each [...map.entries()] as [from, { twiceEffectiveAgainst }], i}
 				{@const [x1, y1] = offset(positions.get(from))}
+				{@const _draw = { delay: 100 * i }}
 				{#each twiceEffectiveAgainst as to}
 					{@const [x2, y2] = offset(positions.get(to))}
 					{@const stroke = map.get(from).color}
@@ -59,12 +61,13 @@
 						{@const x = (radius + loopRadius) * Math.cos(i * angle)}
 						{@const y = (radius + loopRadius) * Math.sin(i * angle)}
 						{@const [cx, cy] = offset([x, y])}
-						<circle {stroke} {cx} {cy} r={loopRadius} />
+						<circle in:draw={_draw} {stroke} {cx} {cy} r={loopRadius} />
 					{:else if path === 'line'}
-						<line {stroke} {x1} {y1} {x2} {y2} />
+						<line in:draw={_draw} {stroke} {x1} {y1} {x2} {y2} />
 					{:else}
 						<path
 							{stroke}
+							in:draw={_draw}
 							d={`M ${x1}, ${y1} Q ${width / 2}, ${height / 2} ${x2}, ${y2}`}
 						/>
 					{/if}
