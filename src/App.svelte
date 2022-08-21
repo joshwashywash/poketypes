@@ -43,12 +43,19 @@
 <main class="flex max-h-screen">
 	<svg viewBox={`0 0 ${width} ${height}`}>
 		<g stroke-linecap="round">
-			{#each [...map.entries()] as [from, { twiceEffectiveAgainst }]}
+			{#each [...map.entries()] as [from, { twiceEffectiveAgainst }], i}
 				{@const { x: x1, y: y1 } = offset(positions.get(from))}
 				{#each twiceEffectiveAgainst as to}
 					{@const { x: x2, y: y2 } = offset(positions.get(to))}
 					{@const stroke = map.get(from).color ?? 'white'}
-					<line {stroke} {x1} {y1} {x2} {y2} />
+					{#if from === to}
+						{@const x = (radius + 4) * Math.cos(i * angle)}
+						{@const y = (radius + 4) * Math.sin(i * angle)}
+						{@const { x: cx, y: cy } = offset({ x, y })}
+						<circle {stroke} fill="none" {cx} {cy} r={4} />
+					{:else}
+						<line {stroke} {x1} {y1} {x2} {y2} />
+					{/if}
 				{/each}
 			{/each}
 		</g>
