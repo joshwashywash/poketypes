@@ -58,9 +58,14 @@
 					{@const [x2, y2] = offset(positions.get(to))}
 					{@const stroke = map.get(from).color}
 					{#if from === to}
-						{@const x = (radius + loopRadius) * Math.cos(i * angle)}
-						{@const y = (radius + loopRadius) * Math.sin(i * angle)}
+						{@const x = (radius + 2 * loopRadius) * Math.cos(i * angle)}
+						{@const y = (radius + 2 * loopRadius) * Math.sin(i * angle)}
 						{@const [cx, cy] = offset([x, y])}
+						<path
+							in:draw={_draw}
+							{stroke}
+							d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 0 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 0 ${x1},${y1}`}
+						/>
 						<circle in:draw={_draw} {stroke} {cx} {cy} r={loopRadius} />
 					{:else if path === 'line'}
 						<line in:draw={_draw} {stroke} {x1} {y1} {x2} {y2} />
