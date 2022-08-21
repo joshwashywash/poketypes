@@ -4,6 +4,7 @@
 	const width = 100;
 	const height = 100;
 	const nodeRadius = 2;
+	const loopRadius = 2 * nodeRadius;
 
 	const map = new Map(Object.entries(types));
 
@@ -49,10 +50,10 @@
 					{@const { x: x2, y: y2 } = offset(positions.get(to))}
 					{@const stroke = map.get(from).color ?? 'white'}
 					{#if from === to}
-						{@const x = (radius + 4) * Math.cos(i * angle)}
-						{@const y = (radius + 4) * Math.sin(i * angle)}
+						{@const x = (radius + loopRadius) * Math.cos(i * angle)}
+						{@const y = (radius + loopRadius) * Math.sin(i * angle)}
 						{@const { x: cx, y: cy } = offset({ x, y })}
-						<circle {stroke} fill="none" {cx} {cy} r={4} />
+						<circle {stroke} fill="none" {cx} {cy} r={loopRadius} />
 					{:else}
 						<line {stroke} {x1} {y1} {x2} {y2} />
 					{/if}
