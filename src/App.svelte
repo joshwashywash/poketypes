@@ -8,22 +8,17 @@
 	const nodeRadius = 2;
 	const loopRadius = 2 * nodeRadius;
 
-	const map = new Map(Object.entries(types));
-
 	const radius = width / 3;
 
-	const positions = new Map<string, Point>();
+	const ts = Object.entries(types);
+	const angle = (2 * Math.PI) / ts.length;
 
-	let i = 0;
-	const angle = (2 * Math.PI) / map.size;
-	for (const name of map.keys()) {
+	const map = new Map();
+	Object.entries(types).forEach(([name, info], i) => {
 		const rotation = i * angle;
-		const position = [Math.cos(rotation), Math.sin(rotation)].map(
-			theta => theta * radius
-		);
-		positions.set(name, position as Point);
-		i += 1;
-	}
+		const position = [Math.cos, Math.sin].map(op => radius * op(rotation));
+		map.set(name, { ...info, position });
+	});
 
 	const createOffset =
 		(width: number, height: number) =>
@@ -36,6 +31,16 @@
 	const ps = ['quadratic', 'line'];
 
 	let [path] = ps;
+
+	let selectedType = 'water';
+	let svg: SVGGElement;
+
+	$: if (svg) {
+		const g = svg.querySelector(`g[data-type=${selectedType}]`);
+		g.parentNode.appendChild(g);
+	}
+
+	const entries = [...map.entries()];
 </script>
 
 <svelte:head>
@@ -49,43 +54,58 @@
 			<input type="radio" bind:group={path} {value} />
 		</label>
 	{/each}
-	<svg viewBox={`0 0 ${width} ${height}`}>
-		<g stroke-linecap="round" fill="none">
-			{#each [...map.entries()] as [from, { twiceEffectiveAgainst }], i}
-				{@const [x1, y1] = offset(positions.get(from))}
-				{@const _draw = { delay: 100 * i }}
-				{#each twiceEffectiveAgainst as to}
-					{@const [x2, y2] = offset(positions.get(to))}
-					{@const stroke = map.get(from).color}
-					{#if from === to}
-						{@const x = (radius + 2 * loopRadius) * Math.cos(i * angle)}
-						{@const y = (radius + 2 * loopRadius) * Math.sin(i * angle)}
-						{@const [cx, cy] = offset([x, y])}
-						{#key path}
+	<svg
+		bind:this={svg}
+		viewBox={`0 0 ${width} ${height}`}
+		stroke-linecap="round"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<g>
+			{#each entries as [from, { color, position, twiceEffectiveAgainst }], i}
+				{@const [x1, y1] = offset(position)}
+				{@const _draw = { delay: 100 * i, duration: 700 }}
+				<g
+					data-type={from}
+					stroke={color}
+					opacity={from === selectedType ? 1 : 0.25}
+				>
+					{#each twiceEffectiveAgainst as to}
+						{@const [x2, y2] = offset(map.get(to).position)}
+						{#if from === to}
+							{@const x = (radius + 2 * loopRadius) * Math.cos(i * angle)}
+							{@const y = (radius + 2 * loopRadius) * Math.sin(i * angle)}
+							{@const [cx, cy] = offset([x, y])}
+							{#key path}
+								<path
+									in:draw={_draw}
+									d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 1 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 1 ${x1},${y1}`}
+								/>
+							{/key}
+						{:else if path === 'line'}
+							<line in:draw={_draw} {x1} {y1} {x2} {y2} />
+						{:else}
 							<path
 								in:draw={_draw}
-								{stroke}
-								d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 0 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 0 ${x1},${y1}`}
+								d={`M ${x1}, ${y1} Q ${width / 2}, ${height / 2} ${x2}, ${y2}`}
 							/>
-						{/key}
-					{:else if path === 'line'}
-						<line in:draw={_draw} {stroke} {x1} {y1} {x2} {y2} />
-					{:else}
-						<path
-							{stroke}
-							in:draw={_draw}
-							d={`M ${x1}, ${y1} Q ${width / 2}, ${height / 2} ${x2}, ${y2}`}
-						/>
-					{/if}
-				{/each}
+						{/if}
+					{/each}
+				</g>
 			{/each}
 		</g>
-		<g>
-			{#each [...positions.entries()] as [name, p]}
-				{@const [cx, cy] = offset(p)}
-				{@const fill = map.get(name).color}
-				<circle {fill} {cx} {cy} r={nodeRadius} />
-			{/each}
-		</g>
+		{#each entries as [type, { color, position }]}
+			{@const [cx, cy] = offset(position)}
+			<circle
+				class="cursor-pointer"
+				fill={color}
+				{cx}
+				{cy}
+				r={nodeRadius}
+				on:click={() => {
+					selectedType = type;
+				}}
+			/>
+		{/each}
 	</svg>
 </main>
