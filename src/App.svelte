@@ -47,8 +47,7 @@
 	<title>Pokemon Types</title>
 </svelte:head>
 
-<main class="flex min-h-screen flex-col items-center bg-black pt-2 text-white">
-	
+<main class="flex h-full max-h-screen flex-col items-center bg-black pt-2 text-white">
 	{#each ps as value}
 		<label class="flex">
 			<span class="pr-2">{value}</span>
@@ -69,7 +68,7 @@
 					<g
 						data-type={from}
 						stroke={color}
-						opacity={from === selectedType ? 1 : 0.25}
+						opacity={from === selectedType ? 1 : .25}
 					>
 						{#each twiceEffectiveAgainst as to}
 							{@const [x2, y2] = offset(map.get(to).position)}
