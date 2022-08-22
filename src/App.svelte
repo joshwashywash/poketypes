@@ -47,7 +47,7 @@
 	<title>Pokemon Types</title>
 </svelte:head>
 
-<main class="flex max-h-screen flex-col items-center pt-2">
+<main class="flex max-h-screen flex-col items-center bg-black pt-2 text-white">
 	{#each ps as value}
 		<label class="flex">
 			<span class="pr-2">{value}</span>
