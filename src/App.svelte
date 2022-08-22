@@ -33,11 +33,11 @@
 	let [path] = ps;
 
 	let selectedType = 'water';
-	let svg: SVGGElement;
+	let g: SVGGElement;
 
-	$: if (svg) {
-		const g = svg.querySelector(`g[data-type=${selectedType}]`);
-		g.parentNode.appendChild(g);
+	$: if (g) {
+		const h = g.querySelector(`g[data-type=${selectedType}]`);
+		h.parentNode.appendChild(h);
 	}
 
 	const entries = [...map.entries()];
@@ -55,16 +55,15 @@
 		</label>
 	{/each}
 	<svg
-		bind:this={svg}
 		viewBox={`0 0 ${width} ${height}`}
 		stroke-linecap="round"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<g>
+		<g bind:this={g}>
 			{#each entries as [from, { color, position, twiceEffectiveAgainst }], i}
 				{@const [x1, y1] = offset(position)}
-				{@const _draw = { delay: 100 * i, duration: 700 }}
+				{@const _draw = { delay: 100 * i, duration: 750 }}
 				<g
 					data-type={from}
 					stroke={color}
