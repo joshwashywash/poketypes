@@ -10,11 +10,10 @@
 
 	const radius = width / 3;
 
-	const ts = Object.entries(types);
-	const angle = (2 * Math.PI) / ts.length;
+	const angle = (2 * Math.PI) / types.length;
 
 	const map = new Map();
-	Object.entries(types).forEach(([name, info], i) => {
+	types.forEach(({name, ...info}, i) => {
 		const rotation = i * angle;
 		const position = [Math.cos, Math.sin].map(op => radius * op(rotation));
 		map.set(name, { ...info, position });
