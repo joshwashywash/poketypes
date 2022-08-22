@@ -13,7 +13,7 @@
 	const angle = (2 * Math.PI) / types.length;
 
 	const map = new Map();
-	types.forEach(({name, ...info}, i) => {
+	types.forEach(({ name, ...info }, i) => {
 		const rotation = i * angle;
 		const position = [Math.cos, Math.sin].map(op => radius * op(rotation));
 		map.set(name, { ...info, position });
@@ -46,14 +46,14 @@
 	<title>Pokemon Types</title>
 </svelte:head>
 
-<main class="flex h-full max-h-screen flex-col items-center bg-black pt-2 text-white">
+<main class="flex h-screen flex-col items-center bg-black pt-2 text-white">
 	{#each ps as value}
 		<label class="flex">
 			<span class="pr-2">{value}</span>
 			<input type="radio" bind:group={path} {value} />
 		</label>
 	{/each}
-	<div class="flex flex-col justify-center grow">
+	<div class="w-1/3">
 		<svg
 			viewBox={`0 0 ${width} ${height}`}
 			stroke-linecap="round"
@@ -67,7 +67,7 @@
 					<g
 						data-type={from}
 						stroke={color}
-						opacity={from === selectedType ? 1 : .25}
+						opacity={from === selectedType ? 1 : 0.25}
 					>
 						{#each twiceEffectiveAgainst as to}
 							{@const [x2, y2] = offset(map.get(to).position)}
