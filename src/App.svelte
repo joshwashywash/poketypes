@@ -18,7 +18,7 @@
 	const angle = (2 * Math.PI) / map.size;
 	for (const name of map.keys()) {
 		const rotation = i * angle;
-		const position = ([Math.cos(rotation), Math.sin(rotation)] as Point).map(
+		const position = [Math.cos(rotation), Math.sin(rotation)].map(
 			theta => theta * radius
 		);
 		positions.set(name, position as Point);
