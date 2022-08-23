@@ -56,7 +56,7 @@
 		{/each}
 	</div>
 	<svg
-		width="100%"
+		class="w-full"
 		fill="none"
 		stroke-linecap="round"
 		viewBox={`0 0 ${width} ${height}`}
