@@ -49,7 +49,7 @@
 <main class="flex max-h-screen flex-col items-center">
 	<div>
 		{#each ps as value}
-			<label class="flex">
+			<label class="flex items-center">
 				<span class="pr-2">{value}</span>
 				<input type="radio" bind:group={path} {value} />
 			</label>
