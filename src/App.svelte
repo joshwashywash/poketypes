@@ -57,7 +57,6 @@
 	</div>
 	<svg
 		width="100%"
-		height="100%"
 		fill="none"
 		stroke-linecap="round"
 		viewBox={`0 0 ${width} ${height}`}
