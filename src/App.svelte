@@ -46,68 +46,68 @@
 	<title>Pokemon Types</title>
 </svelte:head>
 
-<main class="flex h-screen flex-col items-center bg-black pt-2 text-white">
-	{#each ps as value}
-		<label class="flex">
-			<span class="pr-2">{value}</span>
-			<input type="radio" bind:group={path} {value} />
-		</label>
-	{/each}
-	<div class="w-1/3">
-		<svg
-			viewBox={`0 0 ${width} ${height}`}
-			stroke-linecap="round"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<g bind:this={g}>
-				{#each entries as [from, { color, position, twiceEffectiveAgainst }], i}
-					{@const [x1, y1] = offset(position)}
-					{@const _draw = { delay: 100 * i, duration: 750 }}
-					<g
-						data-type={from}
-						stroke={color}
-						opacity={from === selectedType ? 1 : 0.25}
-					>
-						{#each twiceEffectiveAgainst as to}
-							{@const [x2, y2] = offset(map.get(to).position)}
-							{#if from === to}
-								{@const x = (radius + 2 * loopRadius) * Math.cos(i * angle)}
-								{@const y = (radius + 2 * loopRadius) * Math.sin(i * angle)}
-								{@const [cx, cy] = offset([x, y])}
-								{#key path}
-									<path
-										in:draw={_draw}
-										d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 1 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 1 ${x1},${y1}`}
-									/>
-								{/key}
-							{:else if path === 'line'}
-								<line in:draw={_draw} {x1} {y1} {x2} {y2} />
-							{:else}
+<main class="flex max-h-screen flex-col items-center">
+	<div>
+		{#each ps as value}
+			<label class="flex">
+				<span class="pr-2">{value}</span>
+				<input type="radio" bind:group={path} {value} />
+			</label>
+		{/each}
+	</div>
+	<svg
+		width="100%"
+		height="100%"
+		fill="none"
+		stroke-linecap="round"
+		viewBox={`0 0 ${width} ${height}`}
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<g bind:this={g}>
+			{#each entries as [from, { color, position, twiceEffectiveAgainst }], i}
+				{@const [x1, y1] = offset(position)}
+				{@const _draw = { delay: 100 * i, duration: 750 }}
+				<g
+					data-type={from}
+					stroke={color}
+					opacity={from === selectedType ? 1 : 0.25}
+				>
+					{#each twiceEffectiveAgainst as to}
+						{@const [x2, y2] = offset(map.get(to).position)}
+						{#if from === to}
+							{@const x = (radius + 2 * loopRadius) * Math.cos(i * angle)}
+							{@const y = (radius + 2 * loopRadius) * Math.sin(i * angle)}
+							{@const [cx, cy] = offset([x, y])}
+							{#key path}
 								<path
 									in:draw={_draw}
-									d={`M ${x1}, ${y1} Q ${width / 2}, ${
-										height / 2
-									} ${x2}, ${y2}`}
+									d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 1 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 1 ${x1},${y1}`}
 								/>
-							{/if}
-						{/each}
-					</g>
-				{/each}
-			</g>
-			{#each entries as [type, { color, position }]}
-				{@const [cx, cy] = offset(position)}
-				<circle
-					class="cursor-pointer"
-					fill={color}
-					{cx}
-					{cy}
-					r={nodeRadius}
-					on:click={() => {
-						selectedType = type;
-					}}
-				/>
+							{/key}
+						{:else if path === 'line'}
+							<line in:draw={_draw} {x1} {y1} {x2} {y2} />
+						{:else}
+							<path
+								in:draw={_draw}
+								d={`M ${x1}, ${y1} Q ${width / 2}, ${height / 2} ${x2}, ${y2}`}
+							/>
+						{/if}
+					{/each}
+				</g>
 			{/each}
-		</svg>
-	</div>
+		</g>
+		{#each entries as [type, { color, position }]}
+			{@const [cx, cy] = offset(position)}
+			<circle
+				class="cursor-pointer"
+				fill={color}
+				{cx}
+				{cy}
+				r={nodeRadius}
+				on:click={() => {
+					selectedType = type;
+				}}
+			/>
+		{/each}
+	</svg>
 </main>
