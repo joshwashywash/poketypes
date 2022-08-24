@@ -11,11 +11,14 @@
 	const radius = width / 3;
 
 	const angle = (2 * Math.PI) / types.length;
-
-	const map = new Map();
+	const map = new Map<
+		string,
+		{ position: Point } & Omit<typeof types[number], 'name'>
+	>();
 	types.forEach(({ name, ...info }, i) => {
-		const rotation = i * angle;
-		const position = [Math.cos, Math.sin].map(op => radius * op(rotation));
+		const position: = [Math.cos, Math.sin].map(
+			op => radius * op(i * angle)
+		) as Point;
 		map.set(name, { ...info, position });
 	});
 
@@ -31,7 +34,7 @@
 
 	let [path] = ps;
 
-	let selectedType = 'water';
+	let selectedType = types[types.length - 1].name;
 	let g: SVGGElement;
 
 	$: if (g) {
