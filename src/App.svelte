@@ -83,7 +83,7 @@
 							{#key path}
 								<path
 									in:draw={_draw}
-									d={`M ${x1},${y1} A ${loopRadius},${loopRadius} 0 0 1 ${cx},${cy} A ${loopRadius},${loopRadius} 0 0 1 ${x1},${y1}`}
+									d={`M ${x1},${y1} A 1,1 0 0 1 ${cx},${cy} A 1,1 0 0 1 ${x1},${y1}`}
 								/>
 							{/key}
 						{:else if path === 'line'}
