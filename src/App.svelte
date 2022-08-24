@@ -16,7 +16,7 @@
 		{ position: Point } & Omit<typeof types[number], 'name'>
 	>();
 	types.forEach(({ name, ...info }, i) => {
-		const position: = [Math.cos, Math.sin].map(
+		const position = [Math.cos, Math.sin].map(
 			op => radius * op(i * angle)
 		) as Point;
 		map.set(name, { ...info, position });
