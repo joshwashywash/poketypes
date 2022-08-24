@@ -35,8 +35,8 @@
 	let [path] = ps;
 
 	let selectedType = types[types.length - 1].name;
-	let g: SVGGElement;
 
+	let g: SVGGElement;
 	$: if (g) {
 		const h = g.querySelector(`g[data-type=${selectedType}]`);
 		h.parentNode.appendChild(h);
