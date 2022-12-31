@@ -2,85 +2,100 @@
 	{
 		"name": "bug",
 		"color": "#A8B820",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["grass", "psychic", "dark"],
+		"halfEffectiveAgainst": [
+			"fairy",
+			"fighting",
+			"fire",
+			"flying",
+			"ghost",
+			"poison",
+			"steel"
+		],
+		"twiceEffectiveAgainst": ["dark", "grass", "psychic"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "dark",
 		"color": "#705848",
-		"halfEffectiveAgainst": [],
+		"halfEffectiveAgainst": ["dark", "fairy", "fighting"],
 		"twiceEffectiveAgainst": ["ghost", "psychic"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "dragon",
 		"color": "#7038F8",
-		"halfEffectiveAgainst": [],
+		"halfEffectiveAgainst": ["steel"],
 		"twiceEffectiveAgainst": ["dragon"],
-		"zeroEffectiveAgainst": []
+		"zeroEffectiveAgainst": ["fairy"]
 	},
 	{
 		"name": "electric",
 		"color": "#F8D030",
-		"halfEffectiveAgainst": [],
+		"halfEffectiveAgainst": ["dragon", "electric", "grass"],
 		"twiceEffectiveAgainst": ["flying", "water"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "fairy",
 		"color": "#EE99AC",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["fighting", "dragon", "dark"],
+		"halfEffectiveAgainst": ["fire", "poison", "steel"],
+		"twiceEffectiveAgainst": ["dark", "dragon", "fighting"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "fighting",
 		"color": "#C03028",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["normal", "rock", "steel", "ice", "dark"],
-		"zeroEffectiveAgainst": []
+		"halfEffectiveAgainst": ["bug", "fairy", "flying", "poison", "psychic"],
+		"twiceEffectiveAgainst": ["dark", "ice", "normal", "rock", "steel"],
+		"zeroEffectiveAgainst": ["ghost"]
 	},
 	{
 		"name": "fire",
 		"color": "#F08030",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["bug", "steel", "grass", "ice"],
+		"halfEffectiveAgainst": ["dragon", "fire", "rock", "water"],
+		"twiceEffectiveAgainst": ["bug", "grass", "ice", "steel"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "flying",
 		"color": "#A890F0",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["fighting", "bug", "grass"],
+		"halfEffectiveAgainst": ["electric", "rock", "steel"],
+		"twiceEffectiveAgainst": ["bug", "fighting", "grass"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "ghost",
 		"color": "#705898",
-		"halfEffectiveAgainst": [],
+		"halfEffectiveAgainst": ["dark"],
 		"twiceEffectiveAgainst": ["ghost", "psychic"],
-		"zeroEffectiveAgainst": []
+		"zeroEffectiveAgainst": ["normal"]
 	},
 	{
 		"name": "grass",
 		"color": "#78C850",
-		"halfEffectiveAgainst": [],
+		"halfEffectiveAgainst": [
+			"bug",
+			"dragon",
+			"fire",
+			"flying",
+			"grass",
+			"poison"
+		],
 		"twiceEffectiveAgainst": ["ground", "rock", "water"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "ground",
 		"color": "#E0C068",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["poison", "rock", "steel", "fire", "electric"],
-		"zeroEffectiveAgainst": []
+		"halfEffectiveAgainst": ["bug", "grass"],
+		"twiceEffectiveAgainst": ["electric", "fire", "poison", "rock", "steel"],
+		"zeroEffectiveAgainst": ["flying"]
 	},
 	{
 		"name": "ice",
 		"color": "#98D8D8",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["flying", "ground", "grass", "dragon"],
+		"halfEffectiveAgainst": ["fire", "ice", "steel", "water"],
+		"twiceEffectiveAgainst": ["dragon", "flying", "grass", "ground"],
 		"zeroEffectiveAgainst": []
 	},
 	{
@@ -93,36 +108,36 @@
 	{
 		"name": "poison",
 		"color": "#A040A0",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["grass", "fairy"],
-		"zeroEffectiveAgainst": []
+		"halfEffectiveAgainst": ["ghost", "ground", "poison", "rock"],
+		"twiceEffectiveAgainst": ["fairy", "grass"],
+		"zeroEffectiveAgainst": ["steel"]
 	},
 	{
 		"name": "psychic",
 		"color": "#F85888",
-		"halfEffectiveAgainst": [],
+		"halfEffectiveAgainst": ["psychic"],
 		"twiceEffectiveAgainst": ["fighting", "poison"],
-		"zeroEffectiveAgainst": []
+		"zeroEffectiveAgainst": ["dark"]
 	},
 	{
 		"name": "rock",
 		"color": "#B8A038",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["flying", "bug", "fire", "ice"],
+		"halfEffectiveAgainst": ["fighting", "ground", "steel"],
+		"twiceEffectiveAgainst": ["bug", "fire", "flying", "ice"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "steel",
 		"color": "#B8B8D0",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["rock", "ice", "fairy"],
+		"halfEffectiveAgainst": ["electric", "fire", "steel", "water"],
+		"twiceEffectiveAgainst": ["fairy", "ice", "rock"],
 		"zeroEffectiveAgainst": []
 	},
 	{
 		"name": "water",
 		"color": "#6890F0",
-		"halfEffectiveAgainst": [],
-		"twiceEffectiveAgainst": ["ground", "rock", "fire"],
+		"halfEffectiveAgainst": ["dragon", "grass", "water"],
+		"twiceEffectiveAgainst": ["fire", "ground", "rock"],
 		"zeroEffectiveAgainst": []
 	}
 ]

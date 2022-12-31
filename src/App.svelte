@@ -101,7 +101,11 @@
 		{#each entries as [type, { color, position }]}
 			{@const [cx, cy] = offset(position)}
 			<circle
-				class="cursor-pointer"
+				tabIndex={0}
+				on:keydown={() => {
+					selectedType = type;
+				}}
+				class="cursor-pointer focus:outline-none"
 				fill={color}
 				{cx}
 				{cy}
