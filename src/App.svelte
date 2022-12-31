@@ -1,32 +1,33 @@
 <script lang="ts">
-	import type { Point } from '$lib/math';
+	import { pointToString, type Point } from '$lib/math';
 	import types from '$lib/types.json';
 	import { draw } from 'svelte/transition';
 
 	const width = 100;
 	const height = 100;
+	const center: Point = { x: width / 2, y: height / 2 };
 	const nodeRadius = 2;
 	const loopRadius = 2 * nodeRadius;
-
 	const radius = width / 3;
+	const loopScale = radius + 2 * loopRadius;
 
 	const angle = (2 * Math.PI) / types.length;
-	const map = new Map<
-		string,
-		{ position: Point } & Omit<typeof types[number], 'name'>
-	>();
-	types.forEach(({ name, ...info }, i) => {
-		const position = [Math.cos, Math.sin].map(
-			op => radius * op(i * angle)
-		) as Point;
-		map.set(name, { ...info, position });
+
+	type V = { position: Point } & Omit<typeof types[number], 'name'>;
+	const t: [string, V][] = types.map(({ name, ...info }, i) => {
+		const position: Point = {
+			x: radius * Math.cos(i * angle),
+			y: radius * Math.sin(i * angle),
+		};
+		return [name, { ...info, position }];
 	});
+
+	const map = new Map<string, V>(t);
 
 	const createOffset =
 		(width: number, height: number) =>
-		(point: Point): Point => {
-			const [x, y] = point;
-			return [x + width / 2, y + height / 2];
+		(p: Point = { x: 0, y: 0 }): Point => {
+			return { x: p.x + width / 2, y: p.y + height / 2 };
 		};
 
 	const offset = createOffset(width, height);
@@ -43,6 +44,11 @@
 	}
 
 	const entries = [...map.entries()];
+
+	const createLoopPath = (a: Point, b: Point) => {
+		const [s, t] = [a, b].map(p => pointToString(p));
+		return `M ${s} A 1,1 0 0 1 ${t} A 1,1 0 0 1 ${s}`;
+	};
 </script>
 
 <svelte:head>
@@ -67,50 +73,52 @@
 	>
 		<g bind:this={g}>
 			{#each entries as [from, { color, position, twiceEffectiveAgainst }], i}
-				{@const [x1, y1] = offset(position)}
+				{@const s = offset(position)}
 				{@const _draw = { delay: 100 * i, duration: 750 }}
 				<g
 					data-type={from}
 					stroke={color}
-					opacity={from === selectedType ? 1 : 0.25}
+					opacity={from === selectedType ? 1 : 0.15}
 				>
 					{#each twiceEffectiveAgainst as to}
-						{@const [x2, y2] = offset(map.get(to).position)}
 						{#if from === to}
-							{@const x = (radius + 2 * loopRadius) * Math.cos(i * angle)}
-							{@const y = (radius + 2 * loopRadius) * Math.sin(i * angle)}
-							{@const [cx, cy] = offset([x, y])}
+							{@const o = offset({
+								x: loopScale * Math.cos(i * angle),
+								y: loopScale * Math.sin(i * angle),
+							})}
 							{#key path}
+								<path in:draw={_draw} d={createLoopPath(s, o)} />
+							{/key}
+						{:else}
+							{@const e = offset(map.get(to).position)}
+							{#if path === 'line'}
+								<line in:draw={_draw} x1={s.x} y1={s.y} x2={e.x} y2={e.y} />
+							{:else}
 								<path
 									in:draw={_draw}
-									d={`M ${x1},${y1} A 1,1 0 0 1 ${cx},${cy} A 1,1 0 0 1 ${x1},${y1}`}
+									d={`M ${pointToString(s)} Q ${pointToString(
+										center
+									)} ${pointToString(e)}`}
 								/>
-							{/key}
-						{:else if path === 'line'}
-							<line in:draw={_draw} {x1} {y1} {x2} {y2} />
-						{:else}
-							<path
-								in:draw={_draw}
-								d={`M ${x1}, ${y1} Q ${width / 2}, ${height / 2} ${x2}, ${y2}`}
-							/>
+							{/if}
 						{/if}
 					{/each}
 				</g>
 			{/each}
 		</g>
 		{#each entries as [type, { color, position }]}
-			{@const [cx, cy] = offset(position)}
+			{@const { x: cx, y: cy } = offset(position)}
 			<circle
 				tabIndex={0}
-				on:keydown={() => {
-					selectedType = type;
-				}}
-				class="cursor-pointer focus:outline-none"
+				class="cursor-pointer focus-visible:outline-none"
 				fill={color}
 				{cx}
 				{cy}
 				r={nodeRadius}
 				on:click={() => {
+					selectedType = type;
+				}}
+				on:keydown={() => {
 					selectedType = type;
 				}}
 			/>

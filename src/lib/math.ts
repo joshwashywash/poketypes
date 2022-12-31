@@ -1,7 +1,7 @@
-export type Point = [number, number];
+export type Point = { x: number; y: number };
+
+export const pointToString = (p: Point) => `${p.x},${p.y}`;
 
 export const midpoint = (p1: Point, p2: Point): Point => {
-	const [x1, y1] = p1;
-	const [x2, y2] = p2;
-	return [(x1 + x2) / 2, (y1 + y2) / 2];
+	return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
 };
