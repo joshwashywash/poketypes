@@ -108,7 +108,9 @@
 		</g>
 		{#each entries as [type, { color, position }]}
 			{@const { x: cx, y: cy } = offset(position)}
-			{@const switchType = () => {selectedType = type;}}
+			{@const switchType = () => {
+				selectedType = type;
+			}}
 			<circle
 				tabIndex={0}
 				class="cursor-pointer focus-visible:outline-none"
