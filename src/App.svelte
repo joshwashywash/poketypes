@@ -22,15 +22,16 @@
 		return [name, { ...info, position }];
 	});
 
-	const map = new Map<string, V>(t);
+	const map = new Map(t);
 
 	const createOffset =
-		(width: number, height: number) =>
+		(o: Point) =>
 		(p: Point = { x: 0, y: 0 }): Point => {
-			return { x: p.x + width / 2, y: p.y + height / 2 };
+			return { x: p.x + o.x, y: p.y + o.y };
 		};
 
-	const offset = createOffset(width, height);
+	const offset = createOffset(center);
+
 	const ps = ['quadratic', 'line'];
 
 	let [path] = ps;
@@ -45,10 +46,14 @@
 
 	const entries = [...map.entries()];
 
-	const createLoopPath = (a: Point, b: Point) => {
+	const createLoopPath = (a: Point, b: Point): string => {
 		const [s, t] = [a, b].map(p => pointToString(p));
-		return `M ${s} A 1,1 0 0 1 ${t} A 1,1 0 0 1 ${s}`;
+		const p = [s, t, s].flatMap(e => ['A 1,1 0 0 1', e]).slice(1);
+		return `M ${p.join('')}`;
 	};
+
+	const createBezierPath = (s: Point, c: Point, e: Point): string =>
+		`M ${pointToString(s)} Q ${pointToString(c)} ${pointToString(e)}`;
 </script>
 
 <svelte:head>
@@ -94,12 +99,7 @@
 							{#if path === 'line'}
 								<line in:draw={_draw} x1={s.x} y1={s.y} x2={e.x} y2={e.y} />
 							{:else}
-								<path
-									in:draw={_draw}
-									d={`M ${pointToString(s)} Q ${pointToString(
-										center
-									)} ${pointToString(e)}`}
-								/>
+								<path in:draw={_draw} d={createBezierPath(s, center, e)} />
 							{/if}
 						{/if}
 					{/each}
@@ -108,6 +108,7 @@
 		</g>
 		{#each entries as [type, { color, position }]}
 			{@const { x: cx, y: cy } = offset(position)}
+			{@const switchType = () => {selectedType = type;}}
 			<circle
 				tabIndex={0}
 				class="cursor-pointer focus-visible:outline-none"
@@ -115,12 +116,8 @@
 				{cx}
 				{cy}
 				r={nodeRadius}
-				on:click={() => {
-					selectedType = type;
-				}}
-				on:keydown={() => {
-					selectedType = type;
-				}}
+				on:click={switchType}
+				on:keydown={switchType}
 			/>
 		{/each}
 	</svg>
