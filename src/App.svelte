@@ -2,6 +2,7 @@
 	import { pointToString, type Point } from '$lib/math';
 	import types from '$lib/types.json';
 	import { draw } from 'svelte/transition';
+	import { Pane } from 'tweakpane';
 
 	const width = 100;
 	const height = 100;
@@ -32,10 +33,6 @@
 
 	const offset = createOffset(center);
 
-	const ps = ['quadratic', 'line'];
-
-	let [path] = ps;
-
 	let selectedType = types[types.length - 1].name;
 
 	let g: SVGGElement;
@@ -54,6 +51,20 @@
 
 	const createBezierPath = (s: Point, c: Point, e: Point): string =>
 		`M ${pointToString(s)} Q ${pointToString(c)} ${pointToString(e)}`;
+
+	const interpolations = ['line', 'quadratic'];
+	const params = {
+		interpolation: 'line',
+	};
+
+	const pane = new Pane({ title: 'options' });
+	const interpolation = pane.addInput(params, 'interpolation', {
+		options: Object.fromEntries(interpolations.map(i => [i, i])),
+	});
+
+	interpolation.on('change', ({ value }) => {
+		params.interpolation = value;
+	});
 </script>
 
 <svelte:head>
@@ -61,14 +72,6 @@
 </svelte:head>
 
 <main class="flex max-h-screen flex-col items-center">
-	<div>
-		{#each ps as value}
-			<label class="flex items-center">
-				<span class="pr-2">{value}</span>
-				<input type="radio" bind:group={path} {value} />
-			</label>
-		{/each}
-	</div>
 	<svg
 		class="w-full"
 		fill="none"
@@ -91,12 +94,10 @@
 								x: loopScale * Math.cos(i * angle),
 								y: loopScale * Math.sin(i * angle),
 							})}
-							{#key path}
-								<path in:draw={_draw} d={createLoopPath(s, o)} />
-							{/key}
+							<path in:draw={_draw} d={createLoopPath(s, o)} />
 						{:else}
 							{@const e = offset(map.get(to).position)}
-							{#if path === 'line'}
+							{#if params.interpolation === 'line'}
 								<line in:draw={_draw} x1={s.x} y1={s.y} x2={e.x} y2={e.y} />
 							{:else}
 								<path in:draw={_draw} d={createBezierPath(s, center, e)} />
