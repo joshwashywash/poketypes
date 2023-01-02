@@ -14,16 +14,10 @@
 
 	const angle = (2 * Math.PI) / types.length;
 
-	type V = { position: Point } & Omit<typeof types[number], 'name'>;
-	const t: [string, V][] = types.map(({ name, ...info }, i) => {
-		const position: Point = {
-			x: radius * Math.cos(i * angle),
-			y: radius * Math.sin(i * angle),
-		};
-		return [name, { ...info, position }];
-	});
-
-	const map = new Map(t);
+	const positions: Map<string, Point> = types.reduce((m, type, i) => {
+		const [x, y] = [Math.cos, Math.sin].map(f => radius * f(i * angle));
+		return m.set(type.name, { x, y });
+	}, new Map());
 
 	const createOffset =
 		(o: Point) =>
@@ -33,15 +27,13 @@
 
 	const offset = createOffset(center);
 
-	let selectedType = types[types.length - 1].name;
+	let selectedType = types[0].name;
 
 	let g: SVGGElement;
 	$: if (g) {
 		const h = g.querySelector(`g[data-type=${selectedType}]`);
 		h.parentNode.appendChild(h);
 	}
-
-	const entries = [...map.entries()];
 
 	const createLoopPath = (a: Point, b: Point): string => {
 		const [s, t] = [a, b].map(p => pointToString(p));
@@ -54,7 +46,7 @@
 
 	const interpolations = ['line', 'quadratic'];
 	const params = {
-		interpolation: 'line',
+		interpolation: interpolations[0],
 	};
 
 	const pane = new Pane({ title: 'options' });
@@ -80,23 +72,23 @@
 		xmlns="http://www.w3.org/2000/svg"
 	>
 		<g bind:this={g}>
-			{#each entries as [from, { color, position, twiceEffectiveAgainst }], i}
-				{@const s = offset(position)}
+			{#each types as {name, color, twiceEffectiveAgainst}, i}
+				{@const s = offset(positions.get(name))}
 				{@const _draw = { delay: 100 * i, duration: 750 }}
 				<g
-					data-type={from}
+					data-type={name}
 					stroke={color}
-					opacity={from === selectedType ? 1 : 0.15}
+					opacity={name === selectedType ? 1 : 0.15}
 				>
 					{#each twiceEffectiveAgainst as to}
-						{#if from === to}
+						{#if name === to}
 							{@const o = offset({
 								x: loopScale * Math.cos(i * angle),
 								y: loopScale * Math.sin(i * angle),
 							})}
 							<path in:draw={_draw} d={createLoopPath(s, o)} />
 						{:else}
-							{@const e = offset(map.get(to).position)}
+							{@const e = offset(positions.get(to))}
 							{#if params.interpolation === 'line'}
 								<line in:draw={_draw} x1={s.x} y1={s.y} x2={e.x} y2={e.y} />
 							{:else}
@@ -107,10 +99,10 @@
 				</g>
 			{/each}
 		</g>
-		{#each entries as [type, { color, position }]}
-			{@const { x: cx, y: cy } = offset(position)}
+		{#each types as { name, color }}
+			{@const { x: cx, y: cy } = offset(positions.get(name))}
 			{@const switchType = () => {
-				selectedType = type;
+				selectedType = name;
 			}}
 			<circle
 				tabIndex={0}
