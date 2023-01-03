@@ -1,62 +1,58 @@
 <script lang="ts">
-	import { pointToString, type Point } from '$lib/math';
-	import types from '$lib/types.json';
-	import { draw } from 'svelte/transition';
-	import { Pane } from 'tweakpane';
+	import poketypes from '$lib/poketypes.json';
+	import type { SimulationLinkDatum, SimulationNodeDatum } from 'd3-force';
+	import {
+		forceCenter,
+		forceLink,
+		forceManyBody,
+		forceSimulation,
+	} from 'd3-force';
 
-	const width = 100;
-	const height = 100;
-	const center: Point = { x: width / 2, y: height / 2 };
-	const nodeRadius = 2;
-	const loopRadius = 2 * nodeRadius;
-	const radius = width / 3;
-	const loopScale = radius + 2 * loopRadius;
+	const colors = poketypes.reduce(
+		(map, { name, color }) => map.set(name, color),
+		new Map<string, string>()
+	);
 
-	const angle = (2 * Math.PI) / types.length;
+	console.log(colors);
 
-	const positions: Map<string, Point> = types.reduce((m, type, i) => {
-		const [x, y] = [Math.cos, Math.sin].map(f => radius * f(i * angle));
-		return m.set(type.name, { x, y });
-	}, new Map());
+	const angle = (2 * Math.PI) / poketypes.length;
 
-	const createOffset =
-		(o: Point) =>
-		(p: Point = { x: 0, y: 0 }): Point => {
-			return { x: p.x + o.x, y: p.y + o.y };
-		};
+	type Node = SimulationNodeDatum & { id: string };
 
-	const offset = createOffset(center);
-
-	let selectedType = types[0].name;
-
-	let g: SVGGElement;
-	$: if (g) {
-		const h = g.querySelector(`g[data-type=${selectedType}]`);
-		h.parentNode.appendChild(h);
-	}
-
-	const createLoopPath = (a: Point, b: Point): string => {
-		const [s, t] = [a, b].map(p => pointToString(p));
-		const p = [s, t, s].flatMap(e => ['A 1,1 0 0 1', e]).slice(1);
-		return `M ${p.join('')}`;
-	};
-
-	const createBezierPath = (s: Point, c: Point, e: Point): string =>
-		`M ${pointToString(s)} Q ${pointToString(c)} ${pointToString(e)}`;
-
-	const interpolations = ['line', 'quadratic'];
-	const params = {
-		interpolation: interpolations[0],
-	};
-
-	const pane = new Pane({ title: 'options' });
-	const interpolation = pane.addInput(params, 'interpolation', {
-		options: Object.fromEntries(interpolations.map(i => [i, i])),
+	const nodes: Node[] = poketypes.map(({ name }, i) => {
+		const theta = i * angle;
+		const [x, y] = [Math.cos, Math.sin].map(f => f(theta));
+		return { id: name, x, y };
 	});
 
-	interpolation.on('change', ({ value }) => {
-		params.interpolation = value;
-	});
+	const links = poketypes.flatMap(({ name, twiceEffectiveAgainst }) =>
+		twiceEffectiveAgainst.map(target => {
+			return { source: name, target };
+		})
+	);
+
+	type Link = SimulationLinkDatum<Node>;
+	let linkies: Link[] = [];
+
+	const radius = 100;
+	const r = radius / 20;
+	const strokeWidth = r / 2;
+	const diameter = 2 * radius;
+	const viewBox = [-radius, diameter].flatMap(i => [i, i]).join(' ');
+
+	let nodies: Node[] = [];
+
+	forceSimulation(nodes)
+		.force('center', forceCenter())
+		.force('many', forceManyBody())
+		.force(
+			'links',
+			forceLink<Node, Link>(links).id(d => d.id)
+		)
+		.on('tick', () => {
+			nodies = [...nodes];
+			linkies = [...links];
+		});
 </script>
 
 <svelte:head>
@@ -68,52 +64,16 @@
 		class="w-full"
 		fill="none"
 		stroke-linecap="round"
-		viewBox={`0 0 ${width} ${height}`}
+		{viewBox}
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<g bind:this={g}>
-			{#each types as {name, color, twiceEffectiveAgainst}, i}
-				{@const s = offset(positions.get(name))}
-				{@const _draw = { delay: 100 * i, duration: 750 }}
-				<g
-					data-type={name}
-					stroke={color}
-					opacity={name === selectedType ? 1 : 0.15}
-				>
-					{#each twiceEffectiveAgainst as to}
-						{#if name === to}
-							{@const o = offset({
-								x: loopScale * Math.cos(i * angle),
-								y: loopScale * Math.sin(i * angle),
-							})}
-							<path in:draw={_draw} d={createLoopPath(s, o)} />
-						{:else}
-							{@const e = offset(positions.get(to))}
-							{#if params.interpolation === 'line'}
-								<line in:draw={_draw} x1={s.x} y1={s.y} x2={e.x} y2={e.y} />
-							{:else}
-								<path in:draw={_draw} d={createBezierPath(s, center, e)} />
-							{/if}
-						{/if}
-					{/each}
-				</g>
+		<g stroke-width={strokeWidth}>
+			{#each linkies as { source, target }}
+				<line stroke={colors.get(source.id) ?? 'transparent'} x1={source.x} y1={source.y} x2={target.x} y2={target.y} />
 			{/each}
 		</g>
-		{#each types as { name, color }}
-			{@const { x: cx, y: cy } = offset(positions.get(name))}
-			{@const switchType = () => {
-				selectedType = name;
-			}}
-			<circle
-				tabIndex={0}
-				class="cursor-pointer focus-visible:outline-none"
-				fill={color}
-				{cx}
-				{cy}
-				r={nodeRadius}
-				on:click={switchType}
-				on:keydown={switchType}
-			/>
+		{#each nodies as { x, y, id }}
+			<circle fill={colors.get(id) ?? 'transparent'} cx={x} cy={y} {r} />
 		{/each}
 	</svg>
 </main>
