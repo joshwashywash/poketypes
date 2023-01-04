@@ -13,8 +13,6 @@
 		new Map<string, string>()
 	);
 
-	console.log(colors);
-
 	const angle = (2 * Math.PI) / poketypes.length;
 
 	type Node = SimulationNodeDatum & { id: string };
@@ -25,14 +23,13 @@
 		return { id: name, x, y };
 	});
 
-	const links = poketypes.flatMap(({ name, twiceEffectiveAgainst }) =>
+	type Link = SimulationLinkDatum<Node>;
+
+	const links: Link[] = poketypes.flatMap(({ name, twiceEffectiveAgainst }) =>
 		twiceEffectiveAgainst.map(target => {
 			return { source: name, target };
 		})
 	);
-
-	type Link = SimulationLinkDatum<Node>;
-	let linkies: Link[] = [];
 
 	const radius = 100;
 	const r = radius / 20;
@@ -41,8 +38,10 @@
 	const viewBox = [-radius, diameter].flatMap(i => [i, i]).join(' ');
 
 	let nodies: Node[] = [];
+	type ForcedLink = { source: Node; target: Node; id: string };
+	let linkies: ForcedLink[] = [];
 
-	forceSimulation(nodes)
+	forceSimulation<Node, Link>(nodes)
 		.force('center', forceCenter())
 		.force('many', forceManyBody())
 		.force(
@@ -50,8 +49,9 @@
 			forceLink<Node, Link>(links).id(d => d.id)
 		)
 		.on('tick', () => {
-			nodies = [...nodes];
-			linkies = [...links];
+			nodies = nodes;
+			// d3 mutates the links by converting the source and target from a string to a Node. it also adds the id prop
+			linkies = links as ForcedLink[];
 		});
 </script>
 
@@ -69,7 +69,13 @@
 	>
 		<g stroke-width={strokeWidth}>
 			{#each linkies as { source, target }}
-				<line stroke={colors.get(source.id) ?? 'transparent'} x1={source.x} y1={source.y} x2={target.x} y2={target.y} />
+				<line
+					stroke={colors.get(source.id) ?? 'transparent'}
+					x1={source.x}
+					y1={source.y}
+					x2={target.x}
+					y2={target.y}
+				/>
 			{/each}
 		</g>
 		{#each nodies as { x, y, id }}
