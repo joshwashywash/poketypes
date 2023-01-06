@@ -17,25 +17,25 @@
 
 	type Node = SimulationNodeDatum & { id: string };
 
-	let nodes: Node[] = poketypes.map(({ name }, i) => {
-		const theta = i * angle;
-		const [x, y] = [Math.cos, Math.sin].map(f => f(theta));
-		return { id: name, x, y };
-	});
-
 	type Link = SimulationLinkDatum<Node>;
-
-	const links: Link[] = poketypes.flatMap(({ name, twiceEffectiveAgainst }) =>
-		twiceEffectiveAgainst.map(target => {
-			return { source: name, target };
-		})
-	);
 
 	const radius = 100;
 	const r = radius / 20;
 	const strokeWidth = r / 2;
 	const diameter = 2 * radius;
 	const viewBox = [-radius, diameter].flatMap(i => [i, i]).join(' ');
+
+	let nodes: Node[] = poketypes.map(({ name }, i) => {
+		const theta = i * angle;
+		const [x, y] = [Math.cos, Math.sin].map(f => f(theta));
+		return { id: name, x, y };
+	});
+
+	const links: Link[] = poketypes.flatMap(({ name, twiceEffectiveAgainst }) =>
+		twiceEffectiveAgainst.map(target => {
+			return { source: name, target };
+		})
+	);
 
 	type ForcedLink = { source: Node; target: Node; id: string };
 	let linkies: ForcedLink[] = [];
@@ -53,8 +53,7 @@
 			linkies = links as ForcedLink[];
 		});
 
-	const createArcPath = (link: ForcedLink) => {
-		const { source, target } = link;
+	const createArcPath = (source: Node, target: Node) => {
 		const r = Math.hypot(source.x - target.x, source.y - target.y);
 		return `M${source.x},${source.y} A${r},${r} 0 0,1 ${target.x},${target.y}`;
 	};
@@ -67,7 +66,7 @@
 </svelte:head>
 
 <main class="flex max-h-screen flex-col items-center">
-<h1>drag around the points</h1>
+	<h1>drag around the points</h1>
 	<svg
 		on:pointermove={e => {
 			if (heldNode) {
@@ -92,11 +91,11 @@
 		xmlns="http://www.w3.org/2000/svg"
 	>
 		<g stroke-width={strokeWidth}>
-			{#each linkies as link}
+			{#each linkies as { source, target }}
 				<path
-					stroke-opacity={link.source.id === heldNode?.id ? 1 : 0.7}
-					stroke={colors.get(link.source.id) ?? 'transparent'}
-					d={createArcPath(link)}
+					stroke-opacity={source.id === heldNode?.id ? 1 : 0.7}
+					stroke={colors.get(source.id) ?? 'transparent'}
+					d={createArcPath(source, target)}
 				/>
 			{/each}
 		</g>
