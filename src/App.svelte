@@ -89,6 +89,8 @@
 			}}
 			on:pointerup={() => {
 				if (heldNode) {
+					heldNode.fx = null;
+					heldNode.fy = null;
 					heldNode = null;
 					sim.alphaTarget(0);
 				}
