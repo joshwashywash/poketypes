@@ -2,7 +2,8 @@
 	import poketypes from '$lib/poketypes.json';
 	import type { SimulationLinkDatum, SimulationNodeDatum } from 'd3-force';
 	import {
-		forceCenter,
+		forceX,
+		forceY,
 		forceLink,
 		forceManyBody,
 		forceSimulation,
@@ -20,7 +21,7 @@
 	type Link = SimulationLinkDatum<Node>;
 
 	const radius = 100;
-	const r = radius / 20;
+	const r = radius / 25;
 	const strokeWidth = r / 2;
 	const diameter = 2 * radius;
 	const viewBox = [-radius, diameter].flatMap(i => [i, i]).join(' ');
@@ -41,8 +42,9 @@
 	let linkies: ForcedLink[] = [];
 
 	const sim = forceSimulation<Node, Link>(nodes)
-		.force('center', forceCenter())
-		.force('collide', forceManyBody())
+		.force('x', forceX())
+		.force('y', forceY())
+		.force('charge', forceManyBody())
 		.force(
 			'links',
 			forceLink<Node, Link>(links).id(d => d.id)
@@ -59,11 +61,6 @@
 	};
 
 	let heldNode: Node = null;
-
-	const createClamp = (min: number, max: number) => (x: number) =>
-		Math.min(Math.max(x, min), max);
-
-	const clamp = createClamp(-radius, radius);
 </script>
 
 <svelte:head>
@@ -83,8 +80,8 @@
 						currentTarget.getScreenCTM().inverse()
 					);
 
-					heldNode.fx = clamp(point.x);
-					heldNode.fy = clamp(point.y);
+					heldNode.fx = point.x;
+					heldNode.fy = point.y;
 				}
 			}}
 			on:pointerup={() => {
@@ -103,7 +100,7 @@
 			<g stroke-width={strokeWidth}>
 				{#each linkies as { source, target }}
 					<path
-						stroke-opacity={source.id === heldNode?.id ? 1 : 0.5}
+						stroke-opacity={source.id === heldNode?.id ? 1 : 0.3}
 						stroke={colors.get(source.id) ?? 'transparent'}
 						d={createArcPath(source, target)}
 					/>
