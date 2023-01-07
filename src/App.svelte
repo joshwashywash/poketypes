@@ -59,59 +59,70 @@
 	};
 
 	let heldNode: Node = null;
+
+	const createClamp = (min: number, max: number) => (x: number) =>
+		Math.min(Math.max(x, min), max);
+
+	const clamp = createClamp(-radius, radius);
 </script>
 
 <svelte:head>
 	<title>Pokemon Types</title>
 </svelte:head>
 
-<main class="flex max-h-screen flex-col items-center">
-	<h1>drag around the points</h1>
-	<svg
-		on:pointermove={e => {
-			if (heldNode) {
-				const { x, y, currentTarget } = e;
-				const point = new DOMPoint(x, y).matrixTransform(
-					currentTarget.getScreenCTM().inverse()
-				);
-				heldNode.fx = point.x;
-				heldNode.fy = point.y;
-			}
-		}}
-		on:pointerup={() => {
-			if (heldNode) {
-				heldNode = null;
-				sim.alphaTarget(0);
-			}
-		}}
-		class="w-full"
-		fill="none"
-		stroke-linecap="round"
-		{viewBox}
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<g stroke-width={strokeWidth}>
-			{#each linkies as { source, target }}
-				<path
-					stroke-opacity={source.id === heldNode?.id ? 1 : 0.7}
-					stroke={colors.get(source.id) ?? 'transparent'}
-					d={createArcPath(source, target)}
+<main class="flex h-screen flex-col items-center justify-around p-2">
+	<h1>drag around the nodes</h1>
+	<figure class="w-full max-w-xl rounded-xl border-4 border-black">
+		<svg
+			on:pointermove={e => {
+				if (heldNode) {
+					const { currentTarget, pointerId, x, y } = e;
+					currentTarget.setPointerCapture(pointerId);
+
+					const point = new DOMPoint(x, y).matrixTransform(
+						currentTarget.getScreenCTM().inverse()
+					);
+
+					heldNode.fx = clamp(point.x);
+					heldNode.fy = clamp(point.y);
+				}
+			}}
+			on:pointerup={() => {
+				if (heldNode) {
+					heldNode = null;
+					sim.alphaTarget(0);
+				}
+			}}
+			fill="none"
+			stroke-linecap="round"
+			{viewBox}
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<g stroke-width={strokeWidth}>
+				{#each linkies as { source, target }}
+					<path
+						stroke-opacity={source.id === heldNode?.id ? 1 : 0.7}
+						stroke={colors.get(source.id) ?? 'transparent'}
+						d={createArcPath(source, target)}
+					/>
+				{/each}
+			</g>
+			{#each nodes as node}
+				<circle
+					class:cursor-grabbing={node.id === heldNode?.id}
+					class:cursor-grab={heldNode === null}
+					on:pointerdown={() => {
+						heldNode = node;
+						sim.alphaTarget(0.3).restart();
+					}}
+					on:touchstart|preventDefault
+					fill={colors.get(node.id) ?? 'transparent'}
+					cx={node.x}
+					cy={node.y}
+					{r}
 				/>
 			{/each}
-		</g>
-		{#each nodes as node}
-			<circle
-				class:cursor-grabbing={node.id === heldNode?.id}
-				class:cursor-grab={heldNode === null}
-				on:pointerdown={() => {
-					heldNode = node;
-					sim.alphaTarget(0.3).restart();
-				}}
-				fill={colors.get(node.id) ?? 'transparent'}
-				cx={node.x}
-				cy={node.y}
-				{r}
-			/>
-		{/each}
-	</svg>
+		</svg>
+	</figure>
+	<a class="underline" href="http://josho.dev">josho.dev</a>
 </main>
