@@ -103,7 +103,7 @@
 			<g stroke-width={strokeWidth}>
 				{#each linkies as { source, target }}
 					<path
-						stroke-opacity={source.id === heldNode?.id ? 1 : 0.7}
+						stroke-opacity={source.id === heldNode?.id ? 1 : 0.5}
 						stroke={colors.get(source.id) ?? 'transparent'}
 						d={createArcPath(source, target)}
 					/>
