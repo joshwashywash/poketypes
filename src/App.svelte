@@ -20,7 +20,7 @@
 
 	type Link = SimulationLinkDatum<Node>;
 
-	const radius = 100;
+	const radius = 1;
 	const r = radius / 25;
 	const strokeWidth = r / 2;
 	const diameter = 2 * radius;
@@ -42,12 +42,14 @@
 	let linkies: ForcedLink[] = [];
 
 	const sim = forceSimulation<Node, Link>(nodes)
-		.force('x', forceX())
-		.force('y', forceY())
-		.force('charge', forceManyBody())
+		.force('x', forceX().strength(radius / 2))
+		.force('y', forceY().strength(radius / 2))
+		.force('charge', forceManyBody().strength(-r))
 		.force(
 			'links',
-			forceLink<Node, Link>(links).id(d => d.id)
+			forceLink<Node, Link>(links)
+				.id(d => d.id)
+				.distance(radius / 3)
 		)
 		.on('tick', () => {
 			nodes = nodes;
@@ -69,8 +71,9 @@
 
 <main class="flex h-screen flex-col items-center justify-around p-2">
 	<h1>drag around the nodes</h1>
-	<figure class="w-full max-w-xl rounded-xl border-4 border-black">
+	<figure class="w-full max-w-xl">
 		<svg
+			class:cursor-grabbing={heldNode !== null}
 			on:pointermove={e => {
 				if (heldNode) {
 					const { currentTarget, pointerId, x, y } = e;
@@ -108,7 +111,6 @@
 			</g>
 			{#each nodes as node}
 				<circle
-					class:cursor-grabbing={node.id === heldNode?.id}
 					class:cursor-grab={heldNode === null}
 					on:pointerdown={() => {
 						heldNode = node;
