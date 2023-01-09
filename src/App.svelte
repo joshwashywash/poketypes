@@ -58,8 +58,10 @@
 		});
 
 	const createArcPath = (source: Node, target: Node) => {
-		const r = Math.hypot(source.x - target.x, source.y - target.y);
-		return `M${source.x},${source.y} A${r},${r} 0 0,1 ${target.x},${target.y}`;
+		const diffX = target.x - source.x;
+		const diffY = target.y - source.y;
+		const r = Math.hypot(diffX, diffY);
+		return `M${source.x},${source.y} a${r},${r} 0 0,0 ${diffX},${diffY}`;
 	};
 
 	let heldNode: Node = null;
