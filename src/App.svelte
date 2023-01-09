@@ -124,8 +124,8 @@
 							? createLoopPath(sx, sy, 2 * r)
 							: createArcPath(sx, sy, tx, ty)}
 					<path
-						stroke-opacity={source.id === heldNode?.id ? 1 : 0.3}
-						stroke={colors.get(source.id) ?? 'transparent'}
+						stroke-opacity={sID === heldNode?.id ? 1 : 0.3}
+						stroke={colors.get(sID) ?? 'transparent'}
 						{d}
 					/>
 				{/each}
