@@ -57,11 +57,24 @@
 			linkies = links as ForcedLink[];
 		});
 
-	const createArcPath = (source: Node, target: Node) => {
-		const diffX = target.x - source.x;
-		const diffY = target.y - source.y;
+	const createLoopPath = (x: number, y: number, diameter: number) => {
+		const l = Math.hypot(x, y);
+		const [tx, ty] = [x, y].map(s => (diameter * s) / l);
+
+		const r = Math.max(tx, ty) / 2;
+
+		const prefix = `${r},${r} 0 0,0`;
+		const firstHalf = `a${prefix} ${tx},${ty}`;
+		const secondHalf = `${prefix} ${-tx},${-ty}`;
+
+		return `M${x},${y} ${firstHalf} ${secondHalf}`;
+	};
+
+	const createArcPath = (sx: number, sy: number, dx: number, dy: number) => {
+		const diffX = dx - sx;
+		const diffY = dy - sy;
 		const r = Math.hypot(diffX, diffY);
-		return `M${source.x},${source.y} a${r},${r} 0 0,0 ${diffX},${diffY}`;
+		return `M${sx},${sy} a${r},${r} 0 0,0 ${diffX},${diffY}`;
 	};
 
 	let heldNode: Node = null;
@@ -104,10 +117,16 @@
 		>
 			<g stroke-width={strokeWidth}>
 				{#each linkies as { source, target }}
+					{@const { x: sx, y: sy, id: sID } = source}
+					{@const { x: tx, y: ty, id: tID } = target}
+					{@const d =
+						sID === tID
+							? createLoopPath(sx, sy, 2 * r)
+							: createArcPath(sx, sy, tx, ty)}
 					<path
 						stroke-opacity={source.id === heldNode?.id ? 1 : 0.3}
 						stroke={colors.get(source.id) ?? 'transparent'}
-						d={createArcPath(source, target)}
+						{d}
 					/>
 				{/each}
 			</g>
