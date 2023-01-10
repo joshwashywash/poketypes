@@ -85,7 +85,15 @@
 </svelte:head>
 
 <main class="flex h-screen flex-col items-center justify-around p-2">
-	<h1>drag around the nodes</h1>
+	{#if heldNode}
+		{@const { name } = poketypes[heldNode.index]}
+		<p>
+			you're holding
+			<span style:color={colors.get(name) ?? 'transparent'}>{`${name}`}</span>
+		</p>
+	{:else}
+		<p>drag around the nodes</p>
+	{/if}
 	<figure class="w-full max-w-xl">
 		<svg
 			class:cursor-grabbing={heldNode !== null}
