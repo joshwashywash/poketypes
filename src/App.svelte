@@ -89,7 +89,7 @@
 		{@const { name } = poketypes[heldNode.index]}
 		<p>
 			you're holding
-			<span style:color={colors.get(name) ?? 'transparent'}>{`${name}`}</span>
+			<span style:color={colors.get(name) ?? 'transparent'}>{name}</span>
 		</p>
 	{:else}
 		<p>drag around the nodes</p>
