@@ -28,8 +28,7 @@
 
 	let nodes: Node[] = poketypes.map(({ name }, i) => {
 		const theta = i * angle;
-		const [x, y] = [Math.cos, Math.sin].map(f => f(theta));
-		return { id: name, x, y };
+		return { id: name, x: Math.cos(theta), y: Math.sin(theta) };
 	});
 
 	const links: Link[] = poketypes.flatMap(({ name, twiceEffectiveAgainst }) =>
